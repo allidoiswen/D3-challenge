@@ -162,6 +162,18 @@ d3.csv("assets/data/data.csv").then(function(data) {
   // append y axis
   var yAxis = chartGroup.append("g").call(leftAxis);
 
+  // append state abbr by adding another g tag to host them
+  var abbrGroup = chartGroup.append("g").selectAll("text")
+  .data(data)
+  .enter()
+    .append("text")
+    .classed("stateAbbr", true)
+    .attr("x",  d => xLinearScale(d[chosenXAxis]))
+    .attr("y", d => yLinearScale(d.healthcare))
+    .attr("dx", "-.60em")
+    .attr("dy", ".35em")
+    .text(d => d.abbr);
+
   // append initial circles
   var circlesGroup = chartGroup.selectAll("circle")
     .data(data)
@@ -173,17 +185,6 @@ d3.csv("assets/data/data.csv").then(function(data) {
       .attr("fill", "blue")
       .attr("opacity", ".5");
 
-  // append state abbr by adding another g tag to host them
-  var abbrGroup = chartGroup.append("g").selectAll("text")
-    .data(data)
-    .enter()
-      .append("text")
-      .classed("stateAbbr", true)
-      .attr("x",  d => xLinearScale(d[chosenXAxis]))
-      .attr("y", d => yLinearScale(d.healthcare))
-      .attr("dx", "-.60em")
-      .attr("dy", ".35em")
-      .text(d => d.abbr);
 
   // Create group for THREE x-axis labels
   var labelsGroup = chartGroup.append("g")
