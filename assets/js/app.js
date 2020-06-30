@@ -55,7 +55,7 @@ function yScale(data, chosenYAxis) {
 }
 
 // function used for updating xAxis var upon click on axis label
-function renderAxes(newXScale, xAxis) {
+function renderXAxes(newXScale, xAxis) {
   var bottomAxis = d3.axisBottom(newXScale);
 
   xAxis.transition()
@@ -63,6 +63,16 @@ function renderAxes(newXScale, xAxis) {
     .call(bottomAxis);
 
   return xAxis;
+}
+
+function renderYAxes(newYScale, yAxis) {
+  var leftAxis = d3.axisLeft(newYScale);
+
+  yAxis.transition()
+    .duration(1000)
+    .call(leftAxis);
+
+  return yAxis;
 }
 
 // function used for updating circles group with a transition to
@@ -90,6 +100,7 @@ function renderStateAbbr(abbrGroup, newXScale, chosenXAxis) {
 function updateToolTip(chosenXAxis, circlesGroup) {
 
   var xlabel;
+  var ylabel = "Healthcare (%)";
 
   switch (chosenXAxis) {
     case "poverty" : xlabel = "In Poverty (%)";
@@ -105,7 +116,7 @@ function updateToolTip(chosenXAxis, circlesGroup) {
   var toolTip = d3.tip()
     .attr("class", "tooltip")
     .offset([80, -60])
-    .html(function(d) {return (`${d.abbr}<br>${xlabel} : ${d[chosenXAxis]} <br> Healthcare (%): ${d.healthcare}`);});
+    .html(function(d) {return (`${d.abbr}<br>${xlabel}:${d[chosenXAxis]} <br> ${ylabel}:${d.healthcare}`);});
 
   circlesGroup.call(toolTip);
 
@@ -137,9 +148,6 @@ d3.csv("assets/data/data.csv").then(function(data) {
 
   // Create y scale function
   var yLinearScale = yScale(data, chosenYAxis);
-  // var yLinearScale = d3.scaleLinear()
-  // .domain([0, d3.max(data, d => d.healthcare)])
-  // .range([height, 0]);
 
   // Create initial axis functions
   var bottomAxis = d3.axisBottom(xLinearScale);
@@ -152,7 +160,7 @@ d3.csv("assets/data/data.csv").then(function(data) {
     .call(bottomAxis);
 
   // append y axis
-  chartGroup.append("g").call(leftAxis);
+  var yAxis = chartGroup.append("g").call(leftAxis);
 
   // append initial circles
   var circlesGroup = chartGroup.selectAll("circle")
@@ -228,9 +236,11 @@ labelsGroup.selectAll("text").on("click", function() {
     // functions here found above csv import
     // updates x scale for new data
     xLinearScale = xScale(data, chosenXAxis);
+    yLinearScale = yScale(data, chosenYAxis);
 
-    // updates x axis with transition
-    xAxis = renderAxes(xLinearScale, xAxis);
+    // updates axis with transition
+    xAxis = renderXAxes(xLinearScale, xAxis);
+    yAxis = renderYAxes(yLinearScale, yAxis);
 
     // updates circles with new x values
     circlesGroup = renderCircles(circlesGroup, xLinearScale, chosenXAxis);
