@@ -40,6 +40,20 @@ function xScale(data, chosenXAxis) {
 
 }
 
+var chosenYAxis = "healthcare";
+// function used for updating y-scale var upon click on axis label
+function yScale(data, chosenYAxis) {
+  // create scales
+  var yLinearScale = d3.scaleLinear()
+    .domain([d3.min(data, d => d[chosenYAxis]) * 0.5,
+      d3.max(data, d => d[chosenYAxis]) * 1.1
+    ])
+    .range([height, 0]);
+
+  return yLinearScale;
+
+}
+
 // function used for updating xAxis var upon click on axis label
 function renderAxes(newXScale, xAxis) {
   var bottomAxis = d3.axisBottom(newXScale);
@@ -91,7 +105,7 @@ function updateToolTip(chosenXAxis, circlesGroup) {
   var toolTip = d3.tip()
     .attr("class", "tooltip")
     .offset([80, -60])
-    .html(function(d) {return (`${d.abbr}<br>${xlabel} ${d[chosenXAxis]}`);});
+    .html(function(d) {return (`${d.abbr}<br>${xlabel} : ${d[chosenXAxis]} <br> Healthcare (%): ${d.healthcare}`);});
 
   circlesGroup.call(toolTip);
 
@@ -122,9 +136,10 @@ d3.csv("assets/data/data.csv").then(function(data) {
   var xLinearScale = xScale(data, chosenXAxis);
 
   // Create y scale function
-  var yLinearScale = d3.scaleLinear()
-  .domain([0, d3.max(data, d => d.healthcare)])
-  .range([height, 0]);
+  var yLinearScale = yScale(data, chosenYAxis);
+  // var yLinearScale = d3.scaleLinear()
+  // .domain([0, d3.max(data, d => d.healthcare)])
+  // .range([height, 0]);
 
   // Create initial axis functions
   var bottomAxis = d3.axisBottom(xLinearScale);
